@@ -1,1 +1,2 @@
 # operation-death-note
+BECOME EITHER LIGHT OR L CHOOSE YOUR PATH.
