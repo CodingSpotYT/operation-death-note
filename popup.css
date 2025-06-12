@@ -1,0 +1,471 @@
+/* Death Note inspired theme - Black, White, Red */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    width: 400px;
+    min-height: 600px;
+    overflow-x: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+
+/* Header */
+
+.header {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #ff0000;
+    box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #cccccc;
+    letter-spacing: 1px;
+}
+
+
+/* Navigation Tabs */
+
+.tabs {
+    display: flex;
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.tab.active {
+    color: #ff0000;
+    border-bottom-color: #ff0000;
+    background: #2a2a2a;
+}
+
+
+/* Tab Content */
+
+.tab-content {
+    display: none;
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.section-header h2 {
+    font-size: 18px;
+    color: #fff;
+}
+
+.record-count,
+.combat-stats {
+    font-size: 12px;
+    color: #888;
+}
+
+.combat-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.stat {
+    color: #ccc;
+}
+
+
+/* Decision List */
+
+.decision-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.decision-item {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.decision-item:hover {
+    border-color: #ff0000;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.2);
+}
+
+.decision-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.decision-time {
+    font-weight: bold;
+    color: #ff0000;
+    font-size: 14px;
+}
+
+.decision-timestamp {
+    font-size: 11px;
+    color: #888;
+}
+
+.decision-details {
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.decision-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.decision-domain {
+    color: #888;
+    font-style: italic;
+}
+
+
+/* Combat Area */
+
+.combat-scenario {
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 200px;
+}
+
+.scenario-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #fff;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #0a0a0a;
+    border-radius: 6px;
+    border-left: 4px solid #ff0000;
+}
+
+.scenario-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.choice-btn {
+    padding: 12px 15px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-size: 13px;
+}
+
+.choice-btn:hover {
+    background: #3a3a3a;
+    border-color: #ff0000;
+}
+
+.choice-btn.selected {
+    background: #ff0000;
+    border-color: #ff0000;
+}
+
+.scenario-result {
+    background: #0a0a0a;
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #ccc;
+    border-left: 4px solid #00ff00;
+    display: none;
+}
+
+.scenario-result.show {
+    display: block;
+}
+
+.combat-controls {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* Stats Grid */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-bar {
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.stat-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #ff4444);
+    transition: width 0.5s ease;
+    border-radius: 4px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.decision-insights {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.decision-insights h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.insight {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    font-size: 13px;
+    color: #ccc;
+}
+
+.insight:last-child {
+    border-bottom: none;
+}
+
+.insight span {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+
+/* Settings */
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+}
+
+.setting-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    background: #333;
+    border: 2px solid #555;
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.setting-label input[type="checkbox"]:checked+.checkmark {
+    background: #ff0000;
+    border-color: #ff0000;
+}
+
+.setting-label input[type="checkbox"]:checked+.checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+/* Buttons */
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn.primary {
+    background: #ff0000;
+    color: white;
+}
+
+.btn.primary:hover {
+    background: #cc0000;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+}
+
+.btn.secondary {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.btn.secondary:hover {
+    background: #3a3a3a;
+    border-color: #777;
+}
+
+.btn.danger {
+    background: #660000;
+    color: #fff;
+    border: 1px solid #880000;
+}
+
+.btn.danger:hover {
+    background: #880000;
+}
+
+
+/* Version Info */
+
+.version-info {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    text-align: center;
+    color: #666;
+    font-size: 11px;
+}
+
+
+/* No Data State */
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+
+/* Scrollbar Styling */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}

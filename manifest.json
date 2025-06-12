@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "Mind Note – Decision Tracker & Cognitive Combat",
+    "version": "1.0.0",
+    "description": "Track your decisions and train your cognitive abilities through logical combat scenarios",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "tabs"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+    }],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Mind Note"
+    }
+}

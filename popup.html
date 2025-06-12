@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Note</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">Mind Note</h1>
+            <p class="subtitle">Decision Tracker & Cognitive Combat</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="decisions">📘 Journal</button>
+            <button class="tab" data-tab="combat">♟️ Combat</button>
+            <button class="tab" data-tab="stats">📈 Stats</button>
+            <button class="tab" data-tab="settings">⚙️ Settings</button>
+        </nav>
+
+        <!-- Decision Journal Tab -->
+        <div class="tab-content active" id="decisions">
+            <div class="section-header">
+                <h2>Decision Records</h2>
+                <span class="record-count">0 decisions tracked</span>
+            </div>
+            <div class="decision-list" id="decisionList">
+                <div class="no-data">Start browsing to track your decisions...</div>
+            </div>
+        </div>
+
+        <!-- Cognitive Combat Tab -->
+        <div class="tab-content" id="combat">
+            <div class="section-header">
+                <h2>Cognitive Combat</h2>
+                <div class="combat-stats">
+                    <span class="stat">Dilemmas: <span id="totalDilemmas">0</span></span>
+                    <span class="stat">Success: <span id="successRate">0%</span></span>
+                </div>
+            </div>
+
+            <div id="combatArea">
+                <div class="combat-scenario" id="scenarioDisplay">
+                    <div class="scenario-text" id="scenarioText">Click "New Challenge" to begin your cognitive training.</div>
+                    <div class="scenario-choices" id="scenarioChoices"></div>
+                    <div class="scenario-result" id="scenarioResult"></div>
+                </div>
+
+                <div class="combat-controls">
+                    <button class="btn primary" id="newChallengeBtn">New Challenge</button>
+                    <button class="btn secondary" id="resetCombatBtn">Reset Progress</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="tab-content" id="stats">
+            <div class="section-header">
+                <h2>Cognitive Profile</h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Reaction Speed</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="reactionSpeedBar"></div>
+                    </div>
+                    <div class="stat-value" id="reactionSpeedValue">50</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Consistency</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="consistencyBar"></div>
+                    </div>
+                    <div class="stat-value" id="consistencyValue">50</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Risk Tolerance</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="riskToleranceBar"></div>
+                    </div>
+                    <div class="stat-value" id="riskToleranceValue">50</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Logical Depth</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="logicalDepthBar"></div>
+                    </div>
+                    <div class="stat-value" id="logicalDepthValue">50</div>
+                </div>
+            </div>
+
+            <div class="decision-insights">
+                <h3>Recent Patterns</h3>
+                <div id="insightsList">
+                    <div class="insight">Average decision time: <span id="avgDecisionTime">--</span>ms</div>
+                    <div class="insight">Most active domain: <span id="topDomain">--</span></div>
+                    <div class="insight">Total decisions today: <span id="todayCount">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <div class="section-header">
+                <h2>Settings</h2>
+            </div>
+
+            <div class="settings-group">
+                <div class="setting-item">
+                    <label class="setting-label">
+            <input type="checkbox" id="trackingToggle" checked>
+            <span class="checkmark"></span>
+            Enable Decision Tracking
+          </label>
+                </div>
+
+                <div class="setting-item">
+                    <button class="btn secondary" id="exportBtn">📤 Export Decision Log</button>
+                </div>
+
+                <div class="setting-item">
+                    <button class="btn danger" id="clearDataBtn">🗑️ Clear All Data</button>
+                </div>
+
+                <div class="setting-item">
+                    <button class="btn secondary" id="importBtn">📥 Import Scenarios</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </div>
+
+            <div class="version-info">
+                <p>Mind Note v1.0.0</p>
+                <p>Deterministic cognitive training system</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scenarios.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>
