@@ -4,41 +4,70 @@ class DecisionTracker {
         this.hoverStartTime = null;
         this.trackingEnabled = true;
         this.decisionComplexity = 1;
+        this.lastClickTime = null;
+        this.lastClickElement = null;
+        this.lastBodyHTML = document.body.innerHTML;
+        this.lastLocation = window.location.href;
         this.init();
     }
 
     init() {
-        // Check if tracking is enabled
         chrome.storage.local.get(['trackingEnabled'], (result) => {
             this.trackingEnabled = result.trackingEnabled !== false;
             if (this.trackingEnabled) {
                 this.attachListeners();
+                this.setupPageChangeDetection();
             }
         });
     }
 
     attachListeners() {
-        // Track all clickable elements (links, buttons)
-        const clickableSelector = 'a, button, [role="button"], [onclick], input[type="submit"], input[type="button"]';
-
+        // Track all mouseovers (for hover time calculation)
         document.addEventListener('mouseover', (e) => {
-            if (e.target.matches(clickableSelector)) {
-                this.handleHover(e);
-            }
+            this.handleHover(e);
         }, true);
 
+        // Track all clicks (but only process if page changes)
         document.addEventListener('click', (e) => {
-            if (e.target.matches(clickableSelector)) {
-                this.handleClick(e);
-            }
+            this.handleClick(e);
         }, true);
 
-        // Reset hover time when mouse leaves
+        // Reset hover time when mouse leaves any element
         document.addEventListener('mouseout', (e) => {
-            if (e.target.matches(clickableSelector)) {
-                this.hoverStartTime = null;
-            }
+            this.hoverStartTime = null;
         }, true);
+    }
+
+    setupPageChangeDetection() {
+        // Track both MutationObserver and beforeunload for maximum reliability
+        this.setupMutationObserver();
+        window.addEventListener('beforeunload', () => {
+            if (this.lastClickTime) {
+                this.processValidClick(this.lastClickElement);
+            }
+        });
+    }
+
+    setupMutationObserver() {
+        const observer = new MutationObserver((mutations) => {
+            if (this.lastClickTime && Date.now() - this.lastClickTime < 1000) {
+                const currentHTML = document.body.innerHTML;
+                if (currentHTML !== this.lastBodyHTML || window.location.href !== this.lastLocation) {
+                    this.processValidClick(this.lastClickElement);
+                    this.lastClickTime = null;
+                    this.lastClickElement = null;
+                    this.lastBodyHTML = currentHTML;
+                    this.lastLocation = window.location.href;
+                }
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: true
+        });
     }
 
     handleHover(event) {
@@ -46,32 +75,50 @@ class DecisionTracker {
     }
 
     handleClick(event) {
-        if (!this.hoverStartTime) return;
+        // Only track left mouse button clicks
+        if (event.button !== 0) return;
+
+        this.lastClickTime = Date.now();
+        this.lastClickElement = event.target;
+        
+        // Fallback check for page changes
+        setTimeout(() => {
+            if (this.lastClickTime && Date.now() - this.lastClickTime < 1000) {
+                const currentHTML = document.body.innerHTML;
+                if (currentHTML !== this.lastBodyHTML || window.location.href !== this.lastLocation) {
+                    this.processValidClick(this.lastClickElement);
+                    this.lastClickTime = null;
+                    this.lastClickElement = null;
+                    this.lastBodyHTML = currentHTML;
+                    this.lastLocation = window.location.href;
+                }
+            }
+        }, 300);
+    }
+
+    processValidClick(element) {
+        if (!this.hoverStartTime || !element) return;
 
         const decisionTime = Date.now() - this.hoverStartTime;
-        const element = event.target;
+        const isNavigation = window.location.href !== this.lastLocation;
 
-        // Analyze element context for complexity
-        this.analyzeDecisionComplexity(element);
-
-        // Extract link information
-        const linkText = this.extractText(element);
-        const url = this.extractUrl(element);
-        const domain = window.location.hostname;
+        // Skip processing if this is just a minor DOM change (not a real interaction)
+        if (!isNavigation && !this.isSignificantElement(element)) {
+            return;
+        }
 
         const decisionRecord = {
-            url: url,
-            linkText: linkText,
+            url: this.extractUrl(element),
+            linkText: this.extractText(element),
             decisionTime: decisionTime,
             timestamp: new Date().toISOString(),
-            domain: domain,
+            domain: window.location.hostname,
             pageUrl: window.location.href,
-            complexity: this.decisionComplexity,
-            context: this.getDecisionContext(element),
-            alternatives: this.getAlternativeOptions(element)
+            complexity: this.calculateComplexity(element),
+            elementType: element.tagName.toLowerCase(),
+            isNavigation: isNavigation
         };
 
-        // Send to background script for storage
         chrome.runtime.sendMessage({
             action: 'recordDecision',
             data: decisionRecord
@@ -80,53 +127,61 @@ class DecisionTracker {
         this.hoverStartTime = null;
     }
 
-    analyzeDecisionComplexity(element) {
-        // Simple heuristic for decision complexity
+    isSignificantElement(element) {
+        // Check if element is likely interactive
+        const tag = element.tagName.toLowerCase();
+        const role = element.getAttribute('role');
+        
+        return (
+            tag === 'a' || 
+            tag === 'button' || 
+            role === 'button' || 
+            element.onclick || 
+            element.href || 
+            element.getAttribute('onclick') ||
+            element.getAttribute('data-href') ||
+            element.getAttribute('ng-click') ||
+            element.hasAttribute('tabindex')
+        );
+    }
+
+    calculateComplexity(element) {
         let complexity = 1;
         const parent = element.parentElement;
-        if (parent && parent.querySelectorAll('a, button').length > 5) complexity += 1;
-        if (element.classList && element.classList.contains('important')) complexity += 2;
-        if (element.textContent && element.textContent.length > 30) complexity += 1;
-        this.decisionComplexity = Math.min(5, complexity);
-    }
-
-    getDecisionContext(element) {
-        const parent = element.parentElement;
-        const parentText = parent ? parent.textContent.substring(0, 200) : '';
-        return {
-            parentText: parentText.replace(element.textContent || '', '[...]'),
-            siblings: parent ? parent.children.length : 0
-        };
-    }
-
-    getAlternativeOptions(element) {
-        const parent = element.parentElement;
-        if (!parent) return [];
-        return Array.from(parent.children)
-            .filter(child => child !== element && (child.tagName === 'A' || child.tagName === 'BUTTON'))
-            .map(child => this.extractText(child));
+        
+        if (parent) {
+            const interactiveSiblings = Array.from(parent.children)
+                .filter(child => this.isSignificantElement(child)).length;
+            if (interactiveSiblings > 5) complexity += 1;
+        }
+        
+        if (element.classList && (
+            element.classList.contains('btn') || 
+            element.classList.contains('button') ||
+            element.classList.contains('primary') ||
+            element.classList.contains('important')
+        )) complexity += 1;
+        
+        return Math.min(5, complexity);
     }
 
     extractText(element) {
-        // Get visible text content, limited to 100 characters
-        let text = element.textContent || element.innerText || element.alt || element.title || '';
+        const text = element.textContent || element.innerText || element.alt || element.title || '';
         return text.trim().substring(0, 100);
     }
 
     extractUrl(element) {
-        // Extract URL from various element types
         if (element.href) return element.href;
         if (element.action) return element.action;
         if (element.onclick) return 'javascript:onclick';
+        if (element.getAttribute('data-href')) return element.getAttribute('data-href');
         return window.location.href;
     }
 }
 
-// Initialize tracker when DOM is ready
+// Initialize tracker
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new DecisionTracker();
-    });
+    document.addEventListener('DOMContentLoaded', () => new DecisionTracker());
 } else {
     new DecisionTracker();
 }

@@ -142,54 +142,87 @@ class MindNoteApp {
     }
 
     startNewChallenge() {
-        chrome.storage.local.get(['completedDilemmas'], (result) => {
-            const completed = result.completedDilemmas || [];
-            const scenario = ScenarioManager.getRandomScenario(completed);
-
-            if (!scenario) {
-                this.displayScenario({
-                    scenario: "Congratulations! You've completed all available scenarios. More challenges coming soon...",
-                    choices: [],
-                    character: 'System'
-                });
-                return;
-            }
-
-            this.currentScenario = scenario;
-            this.startTime = Date.now();
-            this.displayScenario(scenario);
-        });
-    }
-
-    displayScenario(scenario) {
-        const scenarioText = document.getElementById('scenarioText');
-        const choicesContainer = document.getElementById('scenarioChoices');
-        const resultContainer = document.getElementById('scenarioResult');
-
-        scenarioText.innerHTML = `
-      <strong>${scenario.character}:</strong><br>
-      ${scenario.scenario}
-    `;
-
-        if (scenario.choices.length === 0) {
-            choicesContainer.innerHTML = '';
-            resultContainer.classList.remove('show');
-            return;
-        }
-
-        choicesContainer.innerHTML = scenario.choices.map(choice =>
-            `<button class="choice-btn" data-choice="${choice.id}">${choice.text}</button>`
-        ).join('');
-
-        // Add choice event listeners
-        choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.handleChoice(e.target.dataset.choice);
-            });
-        });
-
-        resultContainer.classList.remove('show');
-    }
+	    chrome.storage.local.get(['completedDilemmas'], (result) => {
+	        const completed = result.completedDilemmas || [];
+	        const scenario = ScenarioManager.getRandomScenario(completed);
+	
+	        if (!scenario) {
+	            this.displayScenario({
+	                scenario: "Congratulations! You've completed all available scenarios. More challenges coming soon...",
+	                choices: [],
+	                character: 'System'
+	            });
+	            return;
+	        }
+	
+	        this.currentScenario = scenario;
+	        this.displayScenario(scenario);
+	        
+	        // Show the ready button and hide choices initially
+	        document.getElementById('readyBtn').style.display = 'block';
+	        document.getElementById('scenarioChoices').style.display = 'none';
+	        document.getElementById('readyBtn').onclick = () => {
+	            this.startCountdown();
+	        };
+	    });
+	}
+	
+	startCountdown() {
+	    const countdownElement = document.getElementById('countdown');
+	    const readyBtn = document.getElementById('readyBtn');
+	    const choicesContainer = document.getElementById('scenarioChoices');
+	    
+	    readyBtn.style.display = 'none';
+	    countdownElement.style.display = 'block';
+	    
+	    let count = 3;
+	    countdownElement.textContent = count;
+	    
+	    const countdownInterval = setInterval(() => {
+	        count--;
+	        countdownElement.textContent = count;
+	        
+	        if (count <= 0) {
+	            clearInterval(countdownInterval);
+	            countdownElement.style.display = 'none';
+	            choicesContainer.style.display = 'block';
+	            this.startTime = Date.now(); // Start timing only when choices are shown
+	        }
+	    }, 1000);
+	}
+	
+	displayScenario(scenario) {
+	    const scenarioText = document.getElementById('scenarioText');
+	    const choicesContainer = document.getElementById('scenarioChoices');
+	    const resultContainer = document.getElementById('scenarioResult');
+	    const readyBtn = document.getElementById('readyBtn');
+	
+	    scenarioText.innerHTML = `
+	      <strong>${scenario.character}:</strong><br>
+	      ${scenario.scenario}
+	    `;
+	
+	    if (scenario.choices.length === 0) {
+	        choicesContainer.innerHTML = '';
+	        resultContainer.classList.remove('show');
+	        readyBtn.style.display = 'none';
+	        return;
+	    }
+	
+	    choicesContainer.innerHTML = scenario.choices.map(choice =>
+	        `<button class="choice-btn" data-choice="${choice.id}">${choice.text}</button>`
+	    ).join('');
+	
+	    // Add choice event listeners
+	    choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
+	        btn.addEventListener('click', (e) => {
+	            this.handleChoice(e.target.dataset.choice);
+	        });
+	    });
+	
+	    resultContainer.classList.remove('show');
+	    choicesContainer.style.display = 'none'; // Hide choices initially
+	}
 
     handleChoice(choiceId) {
         if (!this.currentScenario) return;

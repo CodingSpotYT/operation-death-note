@@ -250,6 +250,14 @@ body {
     gap: 10px;
 }
 
+.countdown {
+    font-size: 24px;
+    color: #ff0000;
+    font-weight: bold;
+    margin: 10px 0;
+    text-align: center;
+}
+
 
 /* Stats Grid */
 
